@@ -14,13 +14,20 @@ dependencies = [
     "google-genai==2.8.0",
     "anthropic==0.109.2",
     "together==2.23.0",
-    "openai==2.43.0",
+    "openai==2.46.0",
     "google-cloud-secret-manager>=2.20.0",
     "google-cloud-storage>=2.14.0",
     "python-dotenv>=1.0.0",
 ]
 
 [project.optional-dependencies]
+# External agent SDKs used by utils.llm.agents. Optional so the base package and its model
+# registry install without them; importing utils.llm.agents does not require them, but running
+# an agent does. The Claude Agent SDK additionally needs the Claude Code CLI on the host.
+agents = [
+    "claude-agent-sdk==0.2.122",
+    "openai-agents==0.18.3",
+]
 dev = [
     "black==26.5.1",
     "flake8==7.3.0",

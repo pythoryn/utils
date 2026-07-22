@@ -10,6 +10,7 @@ _MODEL_RUN_EXPORTS = {
     "MODEL_RUNS_BY_KEY",
     "MODEL_RUNS_BY_SLUG",
     "ModelRun",
+    "agents",
     "get_model_run",
     "get_model_run_by_slug",
     "select_model_runs",
@@ -42,6 +43,7 @@ def __getattr__(name: str):
         globals()[name] = value
         return value
     if name in {
+        "agents",
         "lab_registry",
         "model_registry",
         "model_runs",

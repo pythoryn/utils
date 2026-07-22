@@ -163,6 +163,62 @@ Integration tests that hit real LLM APIs require provider API keys.
 - The model-run integration test calls `model_run.get_response`, so it uses the run's declared provider route, provider model ID, and options.
 - For a newly added model run, prefer running its exact smoke test before assuming the provider accepts the declared options.
 
+## Shared Agent Registry
+
+The `utils.llm.agents` subpackage runs **agents** through external agent SDKs behind an
+interface that mirrors — and is drop-in compatible with — the model registry. Its layering is
+the agent analogue of the model registry's:
+
+- `agents.agent_sdk_registry.AGENT_SDKS` enumerates external agent frameworks (Claude Agent
+  SDK, OpenAI Agents SDK), the agent analogue of the provider registry. Each `AgentSDK` names
+  the provider route (`provider_key`) its base models must use and whose configured key
+  authenticates it.
+- `agents.agent_registry.AGENTS` holds base `Agent`s (an `AgentSDK` bound to a base `Model`
+  from `model_registry`), analogous to `MODELS`.
+- `agents.agent_runs.AGENT_RUNS` holds `AgentRun`s (a base agent plus its system prompt, tools,
+  and SDK harness options), analogous to `MODEL_RUNS`. `ACTIVE_AGENT_RUNS` drops runs whose base
+  model is inactive. Select by immutable `agent_run_key`; use `slug` only as a convenience name.
+- `agents.tools` declares provider-neutral tool specs (`WebSearchSpec`, `WebFetchSpec`,
+  `FunctionToolSpec`, `MCPStdioServerSpec`, `MCPHttpServerSpec`); each provider module under
+  `agents/providers/` translates them into its SDK's native tools.
+- Importing `utils.llm.agents` does **not** import the external SDKs; they are imported lazily
+  only when an agent actually runs. The SDKs live in the optional `[agents]` extra in
+  `pyproject.toml` (`claude-agent-sdk`, `openai-agents`); the Claude Agent SDK additionally
+  needs the Claude Code CLI on the host.
+
+An `AgentRun` exposes the same surface ForecastBench drives on a `ModelRun` — `get_response(prompt)
+-> str` plus `model_run_key`, `slug`, `provider`, `provider_model_id`, `lab`, `release_date`,
+`options` — so it is a drop-in for `runner.run_model`. `AgentRun.run(prompt)` returns the richer
+`AgentResult` (final text + normalized step trajectory + usage/cost); `agents.transcript`
+(`AgentRunTranscript`, `RecordingAgentRun`, `AgentRun.with_transcript`) captures that trajectory
+to Markdown/JSONL.
+
+### Adding a base agent
+
+- Ensure the underlying model exists in `model_registry` (add it there first if not). The
+  model's provider route must match the agent SDK's `provider_key`; `Agent.__post_init__`
+  enforces this.
+- Add it to the SDK-specific list in `utils/llm/agents/agent_registry.py` with `claude_agent`
+  or `openai_agent`. Do not add duplicate `agent_key`s.
+
+### Adding an agent run
+
+- Add it to `utils/llm/agents/agent_runs.py` with `_agent_run(agent_run_key=..., slug=...,
+  agent_key=..., system_prompt=..., tools=..., options=...)`.
+- Write `agent_run_key` explicitly as the stable benchmark identity: `agent_key` plus
+  `-run-variant-XX` where `XX` is the next two-digit variant for that `agent_key`. Never change
+  it after publication.
+- Add every new `agent_run_key` to `HISTORICAL_AGENT_RUN_KEYS` in
+  `tests/unit/test_llm_agent_runs.py`; the ledger is the explicit list of all agent-run keys.
+- Put all run customization (system prompt, tools, harness options) in the `AgentRun`; the base
+  `Agent` carries routing/metadata only, exactly as options live on `ModelRun` not `Model`.
+- Declare tools with the provider-neutral specs in `agents.tools`; use exact runtime option
+  names in `options` (each provider passes a whitelist to its SDK). Token/effort/turn caps that
+  change behavior should be reflected in the handwritten `slug`.
+- Do not add duplicate `agent_run_key`s, `slug`s, or agent-plus-config fingerprints;
+  `create_agent_runs_list(...)` validates uniqueness (the function-tool fingerprint excludes the
+  live Python handler).
+
 ## Validation
 
 - Run `make lint` before committing. It runs `isort .`, `black .`, `flake8 .`,

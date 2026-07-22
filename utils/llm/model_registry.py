@@ -450,6 +450,16 @@ def _get_provider_class(provider: Provider) -> Type[BaseLLMProvider]:
         raise ValueError(f"Unsupported provider: {provider.name}") from exc
 
 
+def configured_api_key_for_provider(provider: Provider) -> str | None:
+    """Return the API key configured for a provider route, or None if unset.
+
+    Shares the single ``configure_api_keys`` key store with model runs so agent runs
+    authenticate against the same configured/GCP-loaded provider keys.
+    """
+    provider_cls = _get_provider_class(provider)
+    return _PROVIDER_API_KEYS.get(provider_cls)
+
+
 def validate_provider_keys(providers: list[Provider]) -> None:
     """Validate that all requested API providers have API keys configured."""
     missing_keys = []
