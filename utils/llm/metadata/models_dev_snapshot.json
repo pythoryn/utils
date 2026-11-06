@@ -786,6 +786,20 @@
           "temperature": false,
           "tool_call": true
         },
+        "gpt-6.1-terra": {
+          "id": "gpt-6.1-terra",
+          "limit": {
+            "context": 1050000,
+            "input": 922000,
+            "output": 128000
+          },
+          "name": "GPT-6.1 Terra",
+          "reasoning": true,
+          "release_date": "2026-10-26",
+          "structured_output": true,
+          "temperature": false,
+          "tool_call": true
+        },
         "o3": {
           "id": "o3",
           "limit": {

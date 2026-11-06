@@ -2023,6 +2023,60 @@ OAI_MODEL_RUNS: list[ModelRun] = [
         },
     ),
     _model_run(
+        model_run_key="gpt-6.1-terra-run-variant-01",
+        slug="gpt-6.1-terra-non-reasoning-web-search",
+        model_key="gpt-6.1-terra",
+        options={
+            "reasoning": {"mode": "standard", "effort": "none"},
+            "tools": [{"type": "web_search"}],
+        },
+    ),
+    _model_run(
+        model_run_key="gpt-6.1-terra-run-variant-02",
+        slug="gpt-6.1-terra-standard-low-web-search",
+        model_key="gpt-6.1-terra",
+        options={
+            "reasoning": {"mode": "standard", "effort": "low"},
+            "tools": [{"type": "web_search"}],
+        },
+    ),
+    _model_run(
+        model_run_key="gpt-6.1-terra-run-variant-03",
+        slug="gpt-6.1-terra-standard-medium-web-search",
+        model_key="gpt-6.1-terra",
+        options={
+            "reasoning": {"mode": "standard", "effort": "medium"},
+            "tools": [{"type": "web_search"}],
+        },
+    ),
+    _model_run(
+        model_run_key="gpt-6.1-terra-run-variant-04",
+        slug="gpt-6.1-terra-standard-high-web-search",
+        model_key="gpt-6.1-terra",
+        options={
+            "reasoning": {"mode": "standard", "effort": "high"},
+            "tools": [{"type": "web_search"}],
+        },
+    ),
+    _model_run(
+        model_run_key="gpt-6.1-terra-run-variant-05",
+        slug="gpt-6.1-terra-standard-xhigh-web-search",
+        model_key="gpt-6.1-terra",
+        options={
+            "reasoning": {"mode": "standard", "effort": "xhigh"},
+            "tools": [{"type": "web_search"}],
+        },
+    ),
+    _model_run(
+        model_run_key="gpt-6.1-terra-run-variant-06",
+        slug="gpt-6.1-terra-standard-max-web-search",
+        model_key="gpt-6.1-terra",
+        options={
+            "reasoning": {"mode": "standard", "effort": "max"},
+            "tools": [{"type": "web_search"}],
+        },
+    ),
+    _model_run(
         model_run_key="o3-2025-04-16-run-variant-01",
         slug="o3-2025-04-16",
         model_key="o3-2025-04-16",
